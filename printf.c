@@ -1,68 +1,106 @@
 #include "main.h"
-
-void print_buffer(char buffer[], int *buff_ind);
+#include <stdlib.h>
 
 /**
- * _printf - Printf function
- * @format: format.
- * Return: Print chars.
+ * check_specifier - checks if there is a valid format specifier
+ * @format: format specifier
+ *
+ * Return: Pointer to Valid function or NULL
  */
-int _printf(const char *format, ...)
+int (*check_specifier(const char *format))(va_list)
 {
-	int i, printed = 0, printed_chars = 0;
-	int flags, width, precision, size, buff_ind = 0;
-	va_list list;
+	unsigned int i;
+	printer fs[] = {
+		{"c", print_char},
+		{"s", print_string},
+		{NULL, NULL}
+	};
 
-	char buffer[BUFF_SIZE];
-
-	if (format == NULL)
-		return (-1);
-
-	va_start(list, format);
-
-	for (i = 0; format && format[i] != '\0'; i++)
+	for (i = 0; fs[i].id != NULL; i++)
 	{
-		if (format[i] != '%')
+		if (*(fs[i].id) == *format)
 		{
-			buffer[buff_ind++] = format[i];
-			if (buff_ind == BUFF_SIZE)
-				print_buffer(buffer, &buff_ind);
-			/* write(1, &format[i], 1);*/
-			printed_chars++;
-		}
-		else
-		{
-			print_buffer(buffer, &buff_ind);
-			flags = get_flags(format, &i);
-			width = get_width(format, &i, list);
-			precision = get_precision(format, &i, list);
-			size = get_size(format, &i);
-			++i;
-			printed = handle_print(format, &i, list, buffer,
-				flags, width, precision, size);
-			if (printed == -1)
-				return (-1);
-			printed_chars += printed;
+			break;
 		}
 	}
-
-	print_buffer(buffer, &buff_ind);
-
-	va_end(list);
-
-	return (printed_chars);
+	return (fs[i].fprint);
 }
 
 /**
- * print_buffer - Prints the contents of the buffer if it exist
- * @buffer: Array of chars
- * @buff_ind: Index at which to add next char, represents the length.
+ * _printf - print
+ * @format: List of argument types passed to the function
+ *
+ * Return: Number of characters printed
  */
-void print_buffer(char buffer[], int *buff_ind)
+int _printf(const char *format, ...)
 {
-	if (*buff_index > 0)
-		write(1, &buffer[0], *buff_ind);
+	unsigned int i = 0, count = 0;
+	va_list valist;
+	int (*fprint)(va_list);
 
-	*buff_ind = 0;
+	if (format == NULL)
+		return (-1);
+	va_start(valist, format);
+	while (format[i])
+	{
+		for (; format[i] != '%' && format[i]; i++)
+		{
+			_putchar(format[i]);
+			count++;
+		}
+		if (!format[i])
+			return (count);
+		fprint = check_specifier(&format[i + 1]);
+		if (fprint != NULL)
+		{
+			count += fprint(valist);
+			i += 2;
+			continue;
+		}
+		if (!format[i + 1])
+			return (-1);
+		_putchar(format[i]);
+		count++;
+		if (format[i + 1] == '%')
+			i += 2;
+		else
+			i++;
+	}
+	va_end(valist);
+	return (count);
+}
+
+/**
+ * print_char - prints a char
+ * @c: char to print
+ *
+ * Return: always 1
+ */
+int print_char(va_list c)
+{
+	char ch = (char)va_arg(c, int);
+
+	_putchar(ch);
+	return (1);
+}
+
+/**
+ * print_string - prints a string
+ * @s: string to print
+ *
+ * Return: number of chars printed
+ */
+int print_string(va_list s)
+{
+	int count;
+	char *str = va_arg(s, char *);
+
+	if (str == NULL)
+		str = "(nill)";
+	for (count = 0; str[count]; count++)
+	{
+		_putchar(str[count]);
+	}
+	return (count);
 }
 
