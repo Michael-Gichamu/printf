@@ -56,13 +56,13 @@ int _printf(const char *format, ...)
 /**
  * print_buffer - Prints the contents of the buffer if it exist
  * @buffer: Array of chars
- * @buffer_index: Index at which to add next char, represents the length.
+ * @buff_ind: Index at which to add next char, represents the length.
  */
-void print_buffer(char buffer[], int *buffer_index)
+void print_buffer(char buffer[], int *buff_ind)
 {
-	if (*buffer_index > 0)
-		write(1, &buffer[0], *buffer_index);
+	if (*buff_index > 0)
+		write(1, &buffer[0], *buff_ind);
 
-	*buffer_index = 0;
+	*buff_ind = 0;
 }
 
