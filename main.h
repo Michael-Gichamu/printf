@@ -15,8 +15,8 @@ typedef struct format_specifier
 
 int _putchar(char c);
 int _printf(const char *format, ...);
-int print_c(va_list c);
-int print_s(va_list s);
+int print_char(va_list c);
+int print_string(va_list s);
 
 #endif
 
