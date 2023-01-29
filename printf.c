@@ -14,6 +14,8 @@ int (*check_specifier(const char *format))(va_list)
 	printer fs[] = {
 		{"c", print_char},
 		{"s", print_string},
+		{"i", print_int},
+		{"d", print_decimal},
 		{NULL, NULL}
 	};
 
